@@ -10,7 +10,4 @@ Chelsea Gary -
 ## Contents
 
 
-## How to compile 
-
-
 ## Bugs/unfinished portions
