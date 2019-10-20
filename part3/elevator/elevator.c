@@ -68,60 +68,60 @@ int elevator_proc_release(struct inode *sp_inode, struct file *sp_file) {
 }
 
 
-
-
-
-
-
-int add_passenger(int type) {
-
-/*
-	int length;
+int addPeople(int type){
 	int weight;
-	char *name;
-	Animal *a;
+	int floor;
+	int passengerUnit;
 
-	if (animals.total_cnt >= MAX_ANIMALS)
+	Person * pers;
+
+	if(persons.totalNumOfPeople >= MAX_PEOPLE){
 		return 0;
+	}
 
-	switch (type) {
-		case ANIMAL_HAMSTER:
-			length = 2;
-			weight = 1;
-			name = "hamster";
+	switch(type){
+		case PEOPLE_ADULT:
+			weight = 2;									//is actually 1
+			passengerUnit = 1;	
+			//have to set floor equal to something
 			break;
-		case ANIMAL_CAT:
-			length = 18;
-			weight = 160;
-			name = "cat";
+		case PEOPLE_CHILD:
+			weight = 1;									//is actually 0.5
+			passengerUnit = 1;
+			//floor initialization
 			break;
-		case ANIMAL_DOG:
-			length = 28;
-			weight = 1200;
-			name = "dog";
+		case PEOPLE_ROOMSERVICE:
+			weight = 4;									//is actually 2
+			passengerUnit = 2;
+			//floor initialization
+			break;
+		case PEOPLE_BELLHOP:
+			weight = 8;									//is actually 4	
+			passengerUnit = 2;
+			//floor initialization
 			break;
 		default:
 			return -1;
 	}
 
-	a = kmalloc(sizeof(Animal) * 1, __GFP_RECLAIM);
-	if (a == NULL)
+	pers = kmalloc(sizeof(Person) * 1, __GFP_RECLAIM);
+	if(pers == NULL){
 		return -ENOMEM;
+	}
 
-	a->id = type;
-	a->length = length;
-	a->weight = weight;
-	a->name = name;
+	pers->weight = weight;
+	pers->passengerUnit = passengerUnit;
+	//pers->floor = ??????? 
 
-	list_add_tail(&a->list, &animals.list);
+	list_add_tail(&pers->list, &persons.list);
 
-	animals.total_cnt += 1;
-	animals.total_length += length;
-	animals.total_weight += weight;
-*/
+	//persons.totalPeople++;
+	persons.totalWeight += weight;
+	persons.totalPassengerUnits += passengerUnit;
 
 	return 0;
 }
+
 
 int print_animals(void) {
 	int i;
