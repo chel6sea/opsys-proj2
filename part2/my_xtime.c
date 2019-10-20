@@ -6,7 +6,7 @@
 #include <linux/time.h>
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
-#include <linux/unaccess.h>
+#include <linux/uaccess.h>
 
 MODULE_LICENSE("GPL");
 //MODULE_LICENSE("Dual BSD/GPL");
@@ -86,7 +86,7 @@ int timeProcOpen(struct inode *sp_inode, struct file *sp_file){
 }
 
 
-ssizer_t timeProcRead(struct file *sp_file, char __user *buf, size_t size, loff_t *offset){
+ssize_t timeProcRead(struct file *sp_file, char __user *buf, size_t size, loff_t *offset){
 	int len = strlen(msg1);
 	
 	read_proc = !read_proc;
