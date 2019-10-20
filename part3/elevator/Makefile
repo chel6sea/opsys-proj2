@@ -1,4 +1,4 @@
-ELEVATOR_MODULE = /usr/src/test_kernel/elevator
+ELEVATOR_MODULE = /usr/src/test_kernel_4.19.75/opsys-proj2/part3/elevator
 .PHONY: compile insert remove start issue stop watch_proc clean
 
 compile: producer.c consumer.c wrappers.h
