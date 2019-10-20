@@ -12,7 +12,7 @@ MODULE_LICENSE("GPL");
 //MODULE_LICENSE("Dual BSD/GPL");
 MODULE_DESCRIPTION("Simple module featuring proc read");
 
-#define ENTRY_NAME "kernelTime"
+#define ENTRY_NAME "timed"
 #define PERMS 0644
 #define PARENT NULL
 
