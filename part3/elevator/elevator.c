@@ -67,6 +67,29 @@ int elevator_proc_release(struct inode *sp_inode, struct file *sp_file) {
 	return 0;
 }
 
+static int elevator_init(void){
+	printk(KERN_NOTICE"/proc/%s create\n", ENTRY_NAME);
+	fops.open = elevator_proc_open;
+	fops.read = elevator_proc_read;
+	fops.release = elevator_proc_release;
+
+	if(!proc_create(ENTRY_NAME, PERMS, NULL, &fops)){
+		printk(KERN_WARNING"ERROR! proc_create\n");
+		remove_proc_entry(ENTRY_NAME, NULL);
+		return -ENOMEM;
+	}
+
+	return 0;
+}
+static void elevator_exit(void){
+	remove_proc_entry(ENTRY_NAME, NULL);
+	printk(KERN_NOTICE"Removing /proc/%s.\n", ENTRY_NAME);
+}
+
+
+
+
+
 
 int addPeople(int type){
 	int weight;
@@ -204,3 +227,9 @@ void delete_animals(int type) {
 		kfree(a);
 	}
 }
+
+
+
+
+module_init(elevator_init);
+module_exit(elevator_exit);
