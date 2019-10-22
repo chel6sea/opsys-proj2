@@ -22,10 +22,9 @@ part 2:
 
 part 3: 
 
-- elevator.h 
-- elevator.c -- elevator module
+- elevator.h, elevator.c -- elevator module
 - producer.c, consumer.c, wrappers.h -- given files
-- Makefile
+- Makefile -- 
 
 ## How to compile
 
@@ -40,6 +39,12 @@ part 2:
 	cat /proc/timed
 
 part 3: 
+
+	make
+	sudo insmod elevator.ko
+	./consumer.x --start
+	./producer.x
+	./consumer.x --stop
 
 ## Bugs/unfinished portions
 
