@@ -1,28 +1,16 @@
-ELEVATOR_MODULE = /usr/src/test_kernel_4.19.75/opsys-proj2/part3/elevator
-.PHONY: compile insert remove start issue stop watch_proc clean
+ifneq ($(KERNELRELEASE),)
+	obj-y := sys_start_elevator.o sys_issue_request.o sys_stop_elevator.o
+	obj-m := elevator.o
+else
+	KERNELDIR ?= /lib/modules/`uname -r`/build/
+	PWD := `pwd`
+default:
+	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+endif
 
-compile: producer.c consumer.c wrappers.h
-	gcc -o producer.x producer.c
+start_elevator:
 	gcc -o consumer.x consumer.c
-
-insert:
-	make -C $(ELEVATOR_MODULE) && sudo insmod $(ELEVATOR_MODULE)/elevator.ko
-remove:
-	sudo rmmod elevator
-
-start: compile
-	./consumer.x --start
-issue: compile
-	./producer.x
-stop: compile
-	./consumer.x --stop
-
-watch_proc:
-	while [ 1 ]; do \
-		clear; clear; \
-		cat /proc/elevator; \
-		sleep 1; \
-	done
+	gcc -o producer.x producer.c
 
 clean:
-	rm *.x
+	rm -f *.ko *.o Module* *.mod.* *.order .*cmd *.x
