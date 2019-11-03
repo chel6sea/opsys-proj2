@@ -1,4 +1,4 @@
-#include <linux/init.h>
+y#include <linux/init.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
@@ -103,22 +103,32 @@ void printElevatorState(char * msg){
 	
 	switch(e.state){
 		case OFFLINE:
-			strcpy(elevState, "OFFLINE");
+			sprintf(message, "Elevator's movement state: OFFLINE \n");
+
+			//strcpy(elevState, "OFFLINE");
 			break;
 		case IDLE:
-			strcpy(elevState, "IDLE");
+			sprintf(message, "Elevator's movement state: IDLE\n");
+
+			//strcpy(elevState, "IDLE");
 			break;
 		case LOADING:
-			strcpy(elevState, "LOADING");
+			sprintf(message, "Elevator's movement state: LOADING\n");
+
+			//strcpy(elevState, "LOADING");
 			break;
 		case UP:
-			strcpy(elevState, "UP");
+			sprintf(message, "Elevator's movement state: UP\n");
+
+			//strcpy(elevState, "UP");
 			break;
 		case DOWN:	
-			strcpy(elevState, "DOWN");
+			sprintf(message, "Elevator's movement state: DOWN\n");
+
+			//strcpy(elevState, "DOWN");
+			break;
 	}		
 	
-	sprintf(message, "Elevator's movement state: %s\n", elevState);
 	sprintf(message, "current floor: %d\n", e.current);
 	sprintf(message, "Next floor: %d\n", e.next);
 	//sprintf(message, "Current load: %d\n", e.load);
