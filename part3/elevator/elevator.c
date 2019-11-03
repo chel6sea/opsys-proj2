@@ -26,10 +26,10 @@ MODULE_DESCRIPTION("elevator module");
 #define DOWN 4
 
 // Passenger states
-#define ADULT 0
-#define CHILD 1
-#define ROOM_SERVICE 2
-#define BELLHOP 3
+#define ADULT 1
+#define CHILD 2
+#define ROOM_SERVICE 3
+#define BELLHOP 4
 
 #define NUM_TYPES 4
 #define MAX_LOAD 15
@@ -37,8 +37,11 @@ MODULE_DESCRIPTION("elevator module");
 
 static struct file_operations fops;
 static char *message;
+static char *elevState;
 static int read_p;
 
+Elevator e;
+Building b;
 int elevator_proc_open(struct inode *sp_inode, struct file *sp_file) {
 	read_p = 1;
 	message = kmalloc(sizeof(char) * ENTRY_SIZE, __GFP_RECLAIM | __GFP_IO | __GFP_FS);
@@ -67,6 +70,103 @@ int elevator_proc_release(struct inode *sp_inode, struct file *sp_file) {
 	return 0;
 }
 
+
+extern long (*STUB_issue_request)(int,int,int);
+long issue_request(int pass_type, int st_floor, int dest_floor){
+	Passenger * passenger;
+	printk("New issue request: %d, %d to %d\n", pass_type, st_floor, dest_floor);
+
+	if(pass_type < 1 || pass_type > 4)
+		return 1;
+	if(st_floor < 1 || st_floor > 10)
+		return 1;
+	if(dest_floor < 1 || dest_floor > 10)
+		return 1;
+
+
+	passenger = kmalloc(sizeof(Passenger), KFLAGS);
+	passenger->passenger_type = pass_type;
+	passenger->start_floor = st_floor;
+	passenger->destination_floor = dest_floor;
+
+	printk("passenger_type: %d, start floor: %d, destination floor: %d\n", passenger->passenger_type, passenger->start_floor, passenger->destination_floor);
+
+	//Need to add locks here???
+	list_add_tail(&passenger->passList, &building->waitList);	
+	//Unlock lock here???
+	
+	return 0;
+}
+
+void printElevatorState(char * msg){
+	sprintf(message, "\n Elevator \n");
+	
+	switch(e.state){
+		case OFFLINE:
+			strcpy(elevState, "OFFLINE");
+			break;
+		case IDLE:
+			strcpy(elevState, "IDLE");
+			break;
+		case LOADING:
+			strcpy(elevState, "LOADING");
+			break;
+		case UP:
+			strcpy(elevState, "UP");
+			break;
+		case DOWN:	
+			strcpy(elevState, "DOWN");
+	}		
+	
+	sprintf(message, "Elevator's movement state: %s\n", elevState);
+	sprintf(message, "current floor: %d\n", e.current);
+	sprintf(message, "Next floor: %d\n", e.next);
+	//sprintf(message, "Current load: %d\n", e.load);
+
+//----------------NEED TO DO THIS-------------------
+	sprintf(message, "Waiting passengers load: \n");
+	sprintf(message, "Current load: %d\nTotal number of passengers: %d\n", e.load, e.count);
+}
+
+
+void printBuildingState(char * msg){
+
+	//got to do this
+	sprintf("Load of waiting passengers: \n");
+	sprintf("Total number of passengers that have been serviced: %d\n", b.serviced);
+}
+
+
+
+/*
+elevator e attributes:
+       int count;
+        int load;
+
+*/
+//--------------------checks if adding load will be okay for elevator---------------------
+
+/*
+int checkLoad(int type){
+	switch(type){
+		case ADULT:
+
+			break;
+		case CHILD:
+
+			break;
+		case ROOM_SERVICE:
+
+			break;
+		case BELLHOP:
+		
+			break;
+	}
+
+	return 0;
+}
+*/
+
 static int elevator_init(void){
 	printk(KERN_NOTICE"/proc/%s create\n", ENTRY_NAME);
 	fops.open = elevator_proc_open;
@@ -83,152 +183,9 @@ static int elevator_init(void){
 }
 static void elevator_exit(void){
 	remove_proc_entry(ENTRY_NAME, NULL);
+	elevator_syscalls_remove();
 	printk(KERN_NOTICE"Removing /proc/%s.\n", ENTRY_NAME);
 }
-
-
-
-
-
-
-int addPeople(int type){
-	int weight;
-	int floor;
-	int passengerUnit;
-
-	Person * pers;
-
-	if(persons.totalNumOfPeople >= MAX_PEOPLE){
-		return 0;
-	}
-
-	switch(type){
-		case PEOPLE_ADULT:
-			weight = 2;									//is actually 1
-			passengerUnit = 1;	
-			//have to set floor equal to something
-			break;
-		case PEOPLE_CHILD:
-			weight = 1;									//is actually 0.5
-			passengerUnit = 1;
-			//floor initialization
-			break;
-		case PEOPLE_ROOMSERVICE:
-			weight = 4;									//is actually 2
-			passengerUnit = 2;
-			//floor initialization
-			break;
-		case PEOPLE_BELLHOP:
-			weight = 8;									//is actually 4	
-			passengerUnit = 2;
-			//floor initialization
-			break;
-		default:
-			return -1;
-	}
-
-	pers = kmalloc(sizeof(Person) * 1, __GFP_RECLAIM);
-	if(pers == NULL){
-		return -ENOMEM;
-	}
-
-	pers->weight = weight;
-	pers->passengerUnit = passengerUnit;
-	//pers->floor = ??????? 
-
-	list_add_tail(&pers->list, &persons.list);
-
-	//persons.totalPeople++;
-	persons.totalWeight += weight;
-	persons.totalPassengerUnits += passengerUnit;
-
-	return 0;
-}
-
-
-int print_animals(void) {
-	int i;
-	Animal *a;
-	struct list_head *temp;
-
-	char *buf = kmalloc(sizeof(char) * 100, __GFP_RECLAIM);
-	if (buf == NULL) {
-		printk(KERN_WARNING "print_animals");
-		return -ENOMEM;
-	}
-
-	/* init message buffer */
-	strcpy(message, "");
-
-	/* headers, print to temporary then append to message buffer */
-	sprintf(buf, "Total count is: %d\n", animals.total_cnt);       strcat(message, buf);
-	sprintf(buf, "Total length is: %d\n", animals.total_length);   strcat(message, buf);
-	sprintf(buf, "Total weight is: %d\n", animals.total_weight);   strcat(message, buf);
-	sprintf(buf, "Animals seen:\n");                               strcat(message, buf);
-
-	/* print entries */
-	i = 0;
-	//list_for_each_prev(temp, &animals.list) { /* backwards */
-	list_for_each(temp, &animals.list) { /* forwards*/
-		a = list_entry(temp, Animal, list);
-
-		/* newline after every 5 entries */
-		if (i % 5 == 0 && i > 0)
-			strcat(message, "\n");
-
-		sprintf(buf, "%s ", a->name);
-		strcat(message, buf);
-
-		i++;
-	}
-
-	/* trailing newline to separate file from commands */
-	strcat(message, "\n");
-
-	kfree(buf);
-	return 0;
-}
-
-void delete_animals(int type) {
-	struct list_head move_list;
-	struct list_head *temp;
-	struct list_head *dummy;
-	int i;
-	Animal *a;
-
-	INIT_LIST_HEAD(&move_list);
-
-	/* move items to a temporary list to illustrate movement */
-	//list_for_each_prev_safe(temp, dummy, &animals.list) { /* backwards */
-	list_for_each_safe(temp, dummy, &animals.list) { /* forwards */
-		a = list_entry(temp, Animal, list);
-
-		if (a->id == type) {
-			//list_move(temp, &move_list); /* move to front of list */
-			list_move_tail(temp, &move_list); /* move to back of list */
-		}
-
-	}
-
-	/* print stats of list to syslog, entry version just as example (not needed here) */
-	i = 0;
-	//list_for_each_entry_reverse(a, &move_list, list) { /* backwards */
-	list_for_each_entry(a, &move_list, list) { /* forwards */
-		/* can access a directly e.g. a->id */
-		i++;
-	}
-	printk(KERN_NOTICE "animal type %d had %d entries\n", type, i);
-
-	/* free up memory allocation of Animals */
-	//list_for_each_prev_safe(temp, dummy, &move_list) { /* backwards */
-	list_for_each_safe(temp, dummy, &move_list) { /* forwards */
-		a = list_entry(temp, Animal, list);
-		list_del(temp);	/* removes entry from list */
-		kfree(a);
-	}
-}
-
-
 
 
 module_init(elevator_init);
