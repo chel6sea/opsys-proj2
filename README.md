@@ -1,11 +1,12 @@
 # project 2:
 
 ## Division of labor
-Betty Tannuzzo -
+Betty Tannuzzo - part 2
 
 Nicole Garcia -
 
-Chelsea Gary -
+Chelsea Gary - documentation, part 1, kernel compiling and stuff, part 3: system calls, module and header file
+
 
 ## Contents
 part 1: 
@@ -24,6 +25,7 @@ part 3:
 
 - elevator.h, elevator.c -- elevator module
 - producer.c, consumer.c, wrappers.h -- given files
+- sys_start_elevator.c, sys_issue_request.c, sys_stop_elevator.c
 - Makefile -- 
 
 ## How to compile
