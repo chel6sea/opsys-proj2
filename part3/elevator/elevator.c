@@ -42,11 +42,13 @@ MODULE_DESCRIPTION("elevator module");
 
 static struct file_operations fops;
 static char *message;
-static char *elevState;
+//static char *elevState;
 static int read_p;
 
 Elevator e;
 Building b;
+
+
 int elevator_proc_open(struct inode *sp_inode, struct file *sp_file) {
 	read_p = 1;
 	message = kmalloc(sizeof(char) * ENTRY_SIZE, __GFP_RECLAIM | __GFP_IO | __GFP_FS);
@@ -89,6 +91,7 @@ long my_stop_elevator(void) {
 
 }
 
+
 extern long (*STUB_issue_request)(int,int,int);
 long my_issue_request(int pass_type, int st_floor, int dest_floor){
 	Passenger * passenger;
@@ -121,26 +124,33 @@ void printElevatorState(char * msg){
 
 	switch(e.state){
 		case OFFLINE:
-			elevState = OFFLINE;
-//			strcpy(elevState, "OFFLINE");
-//			sprintf(message, "Elevator's movement state: OFFLINE\n");
+			sprintf(message, "Elevator's movement state: OFFLINE \n");
+
+			//strcpy(elevState, "OFFLINE");
 			break;
 		case IDLE:
-//			strcpy(elevState, "IDLE");
+			sprintf(message, "Elevator's movement state: IDLE\n");
+
+			//strcpy(elevState, "IDLE");
 			break;
 		case LOADING:
-//			strcpy(elevState, "LOADING");
+			sprintf(message, "Elevator's movement state: LOADING\n");
+
+			//strcpy(elevState, "LOADING");
 			break;
 		case UP:
-//			strcpy(elevState, "UP");
-			break;
-		case DOWN:
-//			strcpy(elevState, "DOWN");
-			break;
-	}
+			sprintf(message, "Elevator's movement state: UP\n");
 
-	sprintf(message, "Elevator's movement state: %s\n", elevState);
-	sprintf(message, "current floor: %d\n", e.curr);
+			//strcpy(elevState, "UP");
+			break;
+		case DOWN:	
+			sprintf(message, "Elevator's movement state: DOWN\n");
+
+			//strcpy(elevState, "DOWN");
+			break;
+	}		
+	
+	sprintf(message, "current floor: %d\n", e.currentFloor);
 	sprintf(message, "Next floor: %d\n", e.next);
 	//sprintf(message, "Current load: %d\n", e.load);
 
@@ -180,7 +190,6 @@ int checkLoad(int type){
 
 			break;
 		case BELLHOP:
-
 			break;
 	}
 
@@ -205,7 +214,6 @@ void elevator_syscalls_remove(void){
 
 static int elevator_init(void){
 	printk(KERN_NOTICE"/proc/%s create\n", ENTRY_NAME);
-	elevator_syscalls_create();
 	fops.open = elevator_proc_open;
 	fops.read = elevator_proc_read;
 	fops.release = elevator_proc_release;
