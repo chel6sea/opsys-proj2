@@ -6,11 +6,9 @@ else
 	PWD := `pwd`
 default:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
-endif
-
-start_elevator:
 	gcc -o consumer.x consumer.c
 	gcc -o producer.x producer.c
+endif
 
 clean:
 	rm -f *.ko *.o Module* *.mod.* *.order .*cmd *.x

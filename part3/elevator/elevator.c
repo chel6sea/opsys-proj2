@@ -18,6 +18,11 @@ MODULE_DESCRIPTION("elevator module");
 #define PERMS 0644
 #define PARENT NULL
 
+#define KFLAGS (__GFP_RECLAIM | __GFP_IO | __GFP_FS)
+#define _NR_START_ELEVATOR 335
+#define _NR_ISSUE_REQUEST 336
+#define _NR_STOP_ELEVATOR 337
+
 // Elevator states
 #define OFFLINE 0
 #define IDLE 1
@@ -37,11 +42,13 @@ MODULE_DESCRIPTION("elevator module");
 
 static struct file_operations fops;
 static char *message;
-static char *elevState;
+//static char *elevState;
 static int read_p;
 
 Elevator e;
 Building b;
+
+
 int elevator_proc_open(struct inode *sp_inode, struct file *sp_file) {
 	read_p = 1;
 	message = kmalloc(sizeof(char) * ENTRY_SIZE, __GFP_RECLAIM | __GFP_IO | __GFP_FS);
@@ -49,9 +56,7 @@ int elevator_proc_open(struct inode *sp_inode, struct file *sp_file) {
 		printk(KERN_WARNING "elevator_proc_open");
 		return -ENOMEM;
 	}
-
-//	add_animal(get_random_int() % NUM_ANIMAL_TYPES);
-//	return print_animals();
+	return 0;
 }
 
 ssize_t elevator_proc_read(struct file *sp_file, char __user *buf, size_t size, loff_t *offset) {
@@ -71,8 +76,48 @@ int elevator_proc_release(struct inode *sp_inode, struct file *sp_file) {
 }
 
 
+extern long (*STUB_start_elevator)(void);
+long my_start_elevator(void) {
+        printk("Starting elevator\n");
+	if (e.state == OFFLINE){
+		e.currentFloor = 1;
+		e.next = -1;
+		e.state = IDLE;
+		e.count = 0;
+		e.load = 0;
+        	return 0;
+	}
+	else if (e.state > 0 || e.state <= 4){	// already active elevator
+		return 1;
+	}
+	else
+		return -ENOMEM;
+
+}
+
+extern long (*STUB_stop_elevator)(void);
+long my_stop_elevator(void) {
+        printk("Stopping elevator\n");
+
+	if (e.count == 0){
+		e.state = OFFLINE;
+		return 0;
+	}
+	else if (e.count > 0 ){
+		//unload remaining passengers
+		int i;
+		for (i=0; i<e.count; ++i){
+			//unload pass
+		}
+		return 0;
+
+	}
+	return 0;
+}
+
+
 extern long (*STUB_issue_request)(int,int,int);
-long issue_request(int pass_type, int st_floor, int dest_floor){
+long my_issue_request(int pass_type, int st_floor, int dest_floor){
 	Passenger * passenger;
 	printk("New issue request: %d, %d to %d\n", pass_type, st_floor, dest_floor);
 
@@ -92,58 +137,49 @@ long issue_request(int pass_type, int st_floor, int dest_floor){
 	printk("passenger_type: %d, start floor: %d, destination floor: %d\n", passenger->passenger_type, passenger->start_floor, passenger->destination_floor);
 
 	//Need to add locks here???
-	list_add_tail(&passenger->passList, &b.waitList);	
+	list_add_tail(&passenger->passList, &b.waitList);
 	//Unlock lock here???
-	
+
 	return 0;
 }
 
 void printElevatorState(char * msg){
 	sprintf(message, "\n Elevator \n");
-	
+
 	switch(e.state){
 		case OFFLINE:
 			sprintf(message, "Elevator's movement state: OFFLINE \n");
-
-			//strcpy(elevState, "OFFLINE");
 			break;
 		case IDLE:
 			sprintf(message, "Elevator's movement state: IDLE\n");
-
-			//strcpy(elevState, "IDLE");
 			break;
 		case LOADING:
 			sprintf(message, "Elevator's movement state: LOADING\n");
-
-			//strcpy(elevState, "LOADING");
 			break;
 		case UP:
 			sprintf(message, "Elevator's movement state: UP\n");
-
-			//strcpy(elevState, "UP");
 			break;
-		case DOWN:	
+		case DOWN:
 			sprintf(message, "Elevator's movement state: DOWN\n");
-
-			//strcpy(elevState, "DOWN");
 			break;
-	}		
-	
-	sprintf(message, "current floor: %d\n", e.current);
+	}
+
+	sprintf(message, "current floor: %d\n", e.currentFloor);
 	sprintf(message, "Next floor: %d\n", e.next);
 	//sprintf(message, "Current load: %d\n", (e.load/2));
 
 //----------------NEED TO DO THIS-------------------
 	sprintf(message, "Waiting passengers load: \n");
 	sprintf(message, "Current load: %d\nTotal number of passengers: %d\n", e.load, e.count);
+
 }
 
 /*
 void printBuildingState(char * msg){
 
 	//got to do this
-	sprintf("Load of waiting passengers: \n");
-	sprintf("Total number of passengers that have been serviced: %d\n", b.serviced);
+//	sprintf("Load of waiting passengers: \n", 0);
+//	sprintf("Total number of passengers that have been serviced: %d\n", b.serviced);
 }
 */
 
@@ -160,7 +196,7 @@ elevator e attributes:
 */
 //--------------------checks if adding load will be okay for elevator---------------------
 
-/*
+
 //MIGHT HAVE TO CHANGE WEIGHT LOAD NUMBERS FOR THIS
 
 int checkLoad(int type){
@@ -185,7 +221,6 @@ int checkLoad(int type){
 
 	return 0;
 }
-*/
 
 int checkFloor(int floor){
 	if(!list_empty(&b.waitList))
@@ -196,11 +231,29 @@ int checkFloor(int floor){
 
 }
 
+
+void elevator_syscalls_create(void){
+        STUB_start_elevator = my_start_elevator;
+        STUB_issue_request = my_issue_request;
+        STUB_stop_elevator = my_stop_elevator;
+}
+
+void elevator_syscalls_remove(void){
+        STUB_start_elevator = NULL;
+        STUB_issue_request = NULL;
+        STUB_stop_elevator = NULL;
+}
+
+
 static int elevator_init(void){
 	printk(KERN_NOTICE"/proc/%s create\n", ENTRY_NAME);
+	elevator_syscalls_create();
+
+
 	fops.open = elevator_proc_open;
 	fops.read = elevator_proc_read;
 	fops.release = elevator_proc_release;
+
 
 	if(!proc_create(ENTRY_NAME, PERMS, NULL, &fops)){
 		printk(KERN_WARNING"ERROR! proc_create\n");
