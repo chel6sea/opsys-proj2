@@ -1,4 +1,4 @@
-y#include <linux/init.h>
+#include <linux/init.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
@@ -32,7 +32,7 @@ MODULE_DESCRIPTION("elevator module");
 #define BELLHOP 4
 
 #define NUM_TYPES 4
-#define MAX_LOAD 15
+#define MAX_LOAD 30
 #define MAX_PASS 10
 
 static struct file_operations fops;
@@ -92,7 +92,7 @@ long issue_request(int pass_type, int st_floor, int dest_floor){
 	printk("passenger_type: %d, start floor: %d, destination floor: %d\n", passenger->passenger_type, passenger->start_floor, passenger->destination_floor);
 
 	//Need to add locks here???
-	list_add_tail(&passenger->passList, &building->waitList);	
+	list_add_tail(&passenger->passList, &b.waitList);	
 	//Unlock lock here???
 	
 	return 0;
@@ -131,51 +131,70 @@ void printElevatorState(char * msg){
 	
 	sprintf(message, "current floor: %d\n", e.current);
 	sprintf(message, "Next floor: %d\n", e.next);
-	//sprintf(message, "Current load: %d\n", e.load);
+	//sprintf(message, "Current load: %d\n", (e.load/2));
 
 //----------------NEED TO DO THIS-------------------
 	sprintf(message, "Waiting passengers load: \n");
 	sprintf(message, "Current load: %d\nTotal number of passengers: %d\n", e.load, e.count);
 }
 
-
+/*
 void printBuildingState(char * msg){
 
 	//got to do this
 	sprintf("Load of waiting passengers: \n");
 	sprintf("Total number of passengers that have been serviced: %d\n", b.serviced);
 }
-
+*/
 
 
 /*
 elevator e attributes:
-       int count;
+	int count;
         int load;
 
+
+
+	#define MAX_LOAD 15
+	#define MAX_PASS 10
 */
 //--------------------checks if adding load will be okay for elevator---------------------
 
 /*
+//MIGHT HAVE TO CHANGE WEIGHT LOAD NUMBERS FOR THIS
+
 int checkLoad(int type){
 	switch(type){
-		case ADULT:
-
+		case ADULT:		
+			if(e.load + 2 <= MAX_LOAD && e.count + 1 <= MAX_PASS)
+				return !(e.load + 1 == MAX_LOAD);	
 			break;
 		case CHILD:
-
+			if(e.load + 1 <= MAX_LOAD && e.count + 1 <= MAX_PASS)
+				return !(e.load + 1 == MAX_LOAD);
 			break;
 		case ROOM_SERVICE:
-
+			if(e.load + 4 <= MAX_LOAD && e.count + 2 <= MAX_PASS)
+				return !(e.load + 2 == MAX_LOAD);
 			break;
 		case BELLHOP:
-		
+			if(e.load + 8 <= MAX_LOAD && e.count + 2 <= MAX_PASS)	
+				return !(e.load + 4 == MAX_LOAD)
 			break;
 	}
 
 	return 0;
 }
 */
+
+int checkFloor(int floor){
+	if(!list_empty(&b.waitList))
+		loadPassenger(floor);	
+
+	if(!list_empty(&b.waitList))
+		unloadPassenger(floor);
+
+}
 
 static int elevator_init(void){
 	printk(KERN_NOTICE"/proc/%s create\n", ENTRY_NAME);
