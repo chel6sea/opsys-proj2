@@ -63,5 +63,6 @@ part 3:
 		WARNING: "STUB_start_elevator" [/.../elevator/elevator.ko] undefined!
 
 - we basically can't really test the elevator scheduling implementation because the system calls are not being recognized by the module
+-- i.e. everything is broken
 
 
