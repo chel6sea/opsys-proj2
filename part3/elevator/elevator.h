@@ -8,7 +8,7 @@ typedef struct {
 } Passenger;
 
 typedef struct {
-        int current;
+        int currentFloor;
         int next;
         int state;
 	int count;
@@ -29,13 +29,15 @@ static int elevator_init(void);
 static void elevator_exit(void);
 
 int checkLoad(int type);
+int checkFloor(int floor);
 void unloadPassenger(int floor);
 void loadPassenger(int floor);
+
 
 void printElevatorState(char * msg);
 void printBuildingState(char * msg);
 
-void issue_request(int pass_type, int st_floor, int dest_floor);
+//long issue_request(int pass_type, int st_floor, int dest_floor);
 
 void elevator_syscalls_create(void);
 void elevator_syscalls_remove(void);
