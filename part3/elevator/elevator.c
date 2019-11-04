@@ -450,21 +450,21 @@ int checkDir(int floor)
 */
 
 void elevator_syscalls_create(void){
-        STUB_start_elevator = my_start_elevator;
-        STUB_issue_request = my_issue_request;
-        STUB_stop_elevator = my_stop_elevator;
+//        STUB_start_elevator = my_start_elevator;
+//        STUB_issue_request = my_issue_request;
+//        STUB_stop_elevator = my_stop_elevator;
 }
 
 void elevator_syscalls_remove(void){
-        STUB_start_elevator = NULL;
-        STUB_issue_request = NULL;
-        STUB_stop_elevator = NULL;
+//        STUB_start_elevator = NULL;
+//        STUB_issue_request = NULL;
+//        STUB_stop_elevator = NULL;
 }
 
 
 static int elevator_init(void){
 	printk(KERN_NOTICE"/proc/%s create\n", ENTRY_NAME);
-	elevator_syscalls_create();
+//	elevator_syscalls_create();
 
 
 	fops.open = elevator_proc_open;
