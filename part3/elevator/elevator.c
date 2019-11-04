@@ -8,6 +8,7 @@
 #include <linux/delay.h>
 #include <linux/sched.h>
 #include <linux/mutex.h>
+#include <linux/kernel.h>
 #include "elevator.h"
 
 // Module setup
@@ -175,24 +176,24 @@ void printElevatorState(char * msg){
 }
 
 void printBuildingState(char * msg){
-	Passenger * passenger;
-	struct list_head ptr;
+//	Passenger * passenger;
+//	struct list_head ptr;
 	int j;
-	int currFloor;
+//	int currFloor;
 	int waitingList[10];			//max 10
 	int index = 0;
 	for(index = 0; index < 10; index++)
 		waitingList[index] = 0;
 
-/*	//make sure waitList isn't empty	
+	//make sure waitList isn't empty
 	if(!list_empty(&b.waitList)){
-		list_for_each(ptr, &passenger->passList){			//iterate through passenger->list
+/*		list_for_each(ptr, &passenger->passList){			//iterate through passenger->list
 			passenger = list_entry(ptr, Passenger, list);
 			currFloor = passenger->start_floor-1;
-			waitingList[start_floor]++;		
+			waitingList[start_floor]++;
 		}
-	}
-*/
+*/	}
+
         sprintf(message, "\nBuilding Status\n");
 	for(j = 0; j < 10; j++)
 		sprintf(message, "Floor %d: %d\n", j+1, waitingList[j]);
@@ -240,7 +241,7 @@ int checkLoad(int type){
 	return 0;
 }
 
-int checkFloor(int floor){
+void checkFloor(int floor){
 	if(!list_empty(&b.waitList))
 		loadPassenger(floor);	
 
@@ -324,8 +325,8 @@ int Move(int floor)
 
 void loadPassenger(int floor)
 {
-        Passenger * pass;
-	struct list_head ptr;
+  //      Passenger * pass;
+//	struct list_head ptr;
 
 	unloadPassenger(e.currentFloor);
         
@@ -367,8 +368,8 @@ void loadPassenger(int floor)
 
 void unloadPassenger(int floor)
 {
-	Passenger * pass;
-	struct list_head ptr;
+//	Passenger * pass;
+//	struct list_head ptr;
 /*
         list_for_each(ptr, &e.rideList)
         {
@@ -420,6 +421,7 @@ int checkType(int type)
                         return 4;
                         break; 
         }
+	return 0;
 }
 
 /*

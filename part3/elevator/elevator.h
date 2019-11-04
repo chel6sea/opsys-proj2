@@ -30,7 +30,7 @@ static int elevator_init(void);
 static void elevator_exit(void);
 
 int checkLoad(int type);
-int checkFloor(int floor);
+void checkFloor(int floor);
 void unloadPassenger(int floor);
 void loadPassenger(int floor);
 
