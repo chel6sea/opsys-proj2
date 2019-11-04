@@ -6,7 +6,8 @@ Betty Tannuzzo - part 2, documentation, part 3: helped with structs;
 		 checkFloor
 
 Nicole Garcia -  part 3: loadPassenger, unloadPassenger, helped
-		 with structs, etc...
+		 with structs, attempted to make the elevator scheduler
+		 and created the helper functions: nextDir & checkType
 
 Chelsea Gary - documentation, part 1, kernel compiling and stuff, 
 	       part 3: system calls, module and header file
@@ -63,6 +64,5 @@ part 3:
 		WARNING: "STUB_start_elevator" [/.../elevator/elevator.ko] undefined!
 
 - we basically can't really test the elevator scheduling implementation because the system calls are not being recognized by the module
--- i.e. everything is broken
 
 
