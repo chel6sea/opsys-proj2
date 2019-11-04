@@ -252,6 +252,204 @@ int checkFloor(int floor){
 
 }
 
+/*
+
+these values are not declared yet, hence commented out
+
+int elevatorSchedule()
+{
+	int nextDir = 0;
+        while(!kthread_should_stop()
+        {
+                switch(movingState)
+                {
+                        case OFFLINE:
+                                break;
+
+                        case IDLE:
+                                nextDir = UP;
+                                break;
+                        case UP:
+                                if(currentFloor == 10)
+                                {
+                                        nextDir = DOWN;
+                                        Move(currentFloor - 1);
+                                        nextFloor = currentFloor - 1;
+                                }
+                                else
+                                {
+                                        nextDir = UP;
+                                        nextFloor = currentFloor + 1;
+                                        Move(nextFloor);
+                                }
+                                break;
+                        case DOWN:
+                                if(currentFloor == 1)
+                                {
+                                        nextDir = UP;
+                                        Move(currentFloor + 1);
+                                        nextFloor = currentFloor + 1;
+                                }
+                                else
+                                {
+                                        nextDir = DOWN;
+                                        Move(currentFloor - 1);
+                                        nextFloor = currentFloor - 1;
+                                }
+                                break;
+                        case LOADING:
+                                ssleep(1);
+                                unload();
+                                                                        
+                }       
+
+
+
+        }
+	return nextDir;
+
+}
+*/
+int Move(int floor)
+{
+        if(floor == currentFloor)
+                return 0;
+        else
+        {
+                printk("Moving to floor %d\n", floor);
+                ssleep(2);
+                currentFloor = floor;
+                return 1;
+
+        }
+
+}
+
+void loadPassenger(int floor)
+{
+        Passenger * pass;
+        unloadPassenger(currentfloor);
+        
+        struct list_head ptr;
+        
+        list_for_each(ptr, &b.waitList)
+        {
+                pass = list_entry(ptr, Passenger, list);
+                if(pass->start_floor == floor && checkLoad(pass->passenger_type))			//might need to put &pass->passenger_type
+                {											//if the elevatorSchedule() values are initialized, add && checkDir() == 0 
+			//serviced[pass->start_floor - 1]+= 1;
+            												//try this commented out serviced and see if it works?            
+			list_move(&pass->list, &e.rideList);
+                        switch(pass->passenger_type)							//might need to put &pass->passenger_type
+                        {
+                                case ADULT:
+                                        e.load+= 2;
+                                        e.count+=1;
+                                        break;
+
+                                case CHILD:
+                                        e.load+=1;
+                                        e.count+=1;
+                                        break;
+
+                                case ROOM_SERVICE:
+                                        e.load+=4;
+                                        e.count+=2;
+                                        break;
+                                
+                                case BELLHOP:
+                                        e.load+=4;
+                                        e.count+=2;
+                                        break;
+                        }
+                }
+        }
+}
+
+
+void unloadPassenger(int floor)
+{
+	Passenger * pass;
+	struct list_head ptr;
+
+        list_for_each(ptr, &e.rideList)
+        {
+                pass = list_entry(ptr, Passenger, list);
+                if(pass->destination_floor == floor)
+                {
+                        switch(pass->passenger_type)							//might need to put &pass->passenger_type
+                        {
+                                case ADULT:
+                                        e.load-= 2;
+                                        e.count-=1;
+                                        break;
+
+                                case CHILD:
+                                        e.load-=1;
+                                        e.count-=1;
+                                        break;
+
+                                case ROOM_SERVICE:
+                                        e.load-=4;
+                                        e.count-=2;
+                                        break;
+
+                                case BELLHOP:
+                                        e.load-=4;
+                                        e.count-=2;
+                                        break;
+                        }
+                        list_del(&pass->list);
+                        kfree(pass);
+                }
+        }
+}
+
+int checkType(type)
+{
+        switch(type)
+        {
+                case ADULT:
+                        return 1;
+                        break;
+                case CHILD:
+                        return 2;
+                        break;
+                case ROOM_SERVICE:
+                        return 3;
+                        break;
+                case BELLHOP:
+                        return 4;
+                        break; 
+        }
+}
+
+/*
+
+this function can not be used until elevatorSchedule() values declared
+
+int checkDir(int floor)
+{
+	int nextDir = elevatorSchedule(floor);
+
+	if(nextDir == UP)
+	{
+		if(pass->destination_floor < floor)
+			return 1;
+		else 
+			return 0;
+	}
+	else if(nextDir == DOWN)
+	{
+		if(pass->destination_floor > floor)
+			return 0;
+		else
+			return 1;
+	}
+	else
+		break;
+}
+*/
 
 void elevator_syscalls_create(void){
         STUB_start_elevator = my_start_elevator;
