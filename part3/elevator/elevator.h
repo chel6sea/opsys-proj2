@@ -34,6 +34,7 @@ int checkFloor(int floor);
 void unloadPassenger(int floor);
 void loadPassenger(int floor);
 
+int checkType(int type);
 
 void printElevatorState(char * msg);
 void printBuildingState(char * msg);

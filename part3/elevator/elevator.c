@@ -177,25 +177,23 @@ void printElevatorState(char * msg){
 void printBuildingState(char * msg){
 	Passenger * passenger;
 	struct list_head ptr;
-	sprintf(message, "\nBuilding Status\n");
-
-
+	int j;
 	int currFloor;
 	int waitingList[10];			//max 10
 	int index = 0;
 	for(index = 0; index < 10; index++)
 		waitingList[index] = 0;
 
-	//make sure waitList isn't empty	
+/*	//make sure waitList isn't empty	
 	if(!list_empty(&b.waitList)){
-		list_for_each(ptr, &passenger->list){			//iterate through passenger->list
+		list_for_each(ptr, &passenger->passList){			//iterate through passenger->list
 			passenger = list_entry(ptr, Passenger, list);
 			currFloor = passenger->start_floor-1;
 			waitingList[start_floor]++;		
 		}
 	}
-
-
+*/
+        sprintf(message, "\nBuilding Status\n");
 	for(j = 0; j < 10; j++)
 		sprintf(message, "Floor %d: %d\n", j+1, waitingList[j]);
 
@@ -235,7 +233,7 @@ int checkLoad(int type){
 			break;
 		case BELLHOP:
 			if(e.load + 8 <= MAX_LOAD && e.count + 2 <= MAX_PASS)	
-				return !(e.load + 4 == MAX_LOAD)
+				return !(e.load + 4 == MAX_LOAD);
 			break;
 	}
 
@@ -311,13 +309,13 @@ int elevatorSchedule()
 */
 int Move(int floor)
 {
-        if(floor == currentFloor)
+        if(floor == e.currentFloor)
                 return 0;
         else
         {
                 printk("Moving to floor %d\n", floor);
                 ssleep(2);
-                currentFloor = floor;
+                e.currentFloor = floor;
                 return 1;
 
         }
@@ -327,10 +325,11 @@ int Move(int floor)
 void loadPassenger(int floor)
 {
         Passenger * pass;
-        unloadPassenger(currentfloor);
+	struct list_head ptr;
+
+	unloadPassenger(e.currentFloor);
         
-        struct list_head ptr;
-        
+/*        
         list_for_each(ptr, &b.waitList)
         {
                 pass = list_entry(ptr, Passenger, list);
@@ -338,7 +337,7 @@ void loadPassenger(int floor)
                 {											//if the elevatorSchedule() values are initialized, add && checkDir() == 0 
 			//serviced[pass->start_floor - 1]+= 1;
             												//try this commented out serviced and see if it works?            
-			list_move(&pass->list, &e.rideList);
+			list_move(&pass->passList, &e.rideList);
                         switch(pass->passenger_type)							//might need to put &pass->passenger_type
                         {
                                 case ADULT:
@@ -363,20 +362,20 @@ void loadPassenger(int floor)
                         }
                 }
         }
-}
+*/}
 
 
 void unloadPassenger(int floor)
 {
 	Passenger * pass;
 	struct list_head ptr;
-
+/*
         list_for_each(ptr, &e.rideList)
         {
                 pass = list_entry(ptr, Passenger, list);
                 if(pass->destination_floor == floor)
                 {
-                        switch(pass->passenger_type)							//might need to put &pass->passenger_type
+                        switch(pass->passenger_type)			//might need to put &pass->passenger_type
                         {
                                 case ADULT:
                                         e.load-= 2;
@@ -402,9 +401,9 @@ void unloadPassenger(int floor)
                         kfree(pass);
                 }
         }
-}
+*/}
 
-int checkType(type)
+int checkType(int type)
 {
         switch(type)
         {
