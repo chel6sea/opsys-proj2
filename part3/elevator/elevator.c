@@ -174,7 +174,6 @@ void printElevatorState(char * msg){
 
 }
 
-/*
 void printBuildingState(char * msg){
 	Passenger * passenger;
 	struct list_head ptr;
@@ -202,7 +201,7 @@ void printBuildingState(char * msg){
 
 	sprintf(message, "Total passengers serviced: %d\n", b.serviced);	
 }
-*/
+
 
 
 /*
