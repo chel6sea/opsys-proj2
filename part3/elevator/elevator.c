@@ -176,10 +176,31 @@ void printElevatorState(char * msg){
 
 /*
 void printBuildingState(char * msg){
+	Passenger * passenger;
+	struct list_head ptr;
+	sprintf(message, "\nBuilding Status\n");
 
-	//got to do this
-//	sprintf("Load of waiting passengers: \n", 0);
-//	sprintf("Total number of passengers that have been serviced: %d\n", b.serviced);
+
+	int currFloor;
+	int waitingList[10];			//max 10
+	int index = 0;
+	for(index = 0; index < 10; index++)
+		waitingList[index] = 0;
+
+	//make sure waitList isn't empty	
+	if(!list_empty(&b.waitList)){
+		list_for_each(ptr, &passenger->list){			//iterate through passenger->list
+			passenger = list_entry(ptr, Passenger, list);
+			currFloor = passenger->start_floor-1;
+			waitingList[start_floor]++;		
+		}
+	}
+
+
+	for(j = 0; j < 10; j++)
+		sprintf(message, "Floor %d: %d\n", j+1, waitingList[j]);
+
+	sprintf(message, "Total passengers serviced: %d\n", b.serviced);	
 }
 */
 
