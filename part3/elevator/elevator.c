@@ -169,8 +169,8 @@ void printElevatorState(char * msg){
 	//sprintf(message, "Current load: %d\n", (e.load/2));
 
 //----------------NEED TO DO THIS-------------------
-	sprintf(message, "Waiting passengers load: \n");
-	sprintf(message, "Current load: %d\nTotal number of passengers: %d\n", e.load, e.count);
+	//sprintf(message, "Waiting passengers load: \n");
+	//sprintf(message, "Current load: %d\nTotal number of passengers: %d\n", e.load, e.count);
 
 }
 
@@ -254,7 +254,7 @@ int checkFloor(int floor){
 
 /*
 
-these values are not declared yet, hence commented out
+//these values are not declared yet, hence commented out
 
 int elevatorSchedule()
 {

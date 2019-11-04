@@ -17,6 +17,7 @@ typedef struct {
 } Elevator;
 
 typedef struct{
+	//int serviced[];
 	int serviced;
 	struct list_head waitList;
 }Building;
