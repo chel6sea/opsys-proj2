@@ -79,16 +79,40 @@ int elevator_proc_release(struct inode *sp_inode, struct file *sp_file) {
 extern long (*STUB_start_elevator)(void);
 long my_start_elevator(void) {
         printk("Starting elevator\n");
+	if (e.state == OFFLINE){
+		e.currentFloor = 1;
+		e.next = -1;
+		e.state = IDLE;
+		e.count = 0;
+		e.load = 0;
+        	return 0;
+	}
+	else if (e.state > 0 || e.state <= 4){	// already active elevator
+		return 1;
+	}
+	else
+		return -ENOMEM;
 
-        return 0;
 }
 
 extern long (*STUB_stop_elevator)(void);
 long my_stop_elevator(void) {
         printk("Stopping elevator\n");
 
-        return 0;
+	if (e.count == 0){
+		e.state = OFFLINE;
+		return 0;
+	}
+	else if (e.count > 0 ){
+		//unload remaining passengers
+		int i;
+		for (i=0; i<e.count; ++i){
+			//unload pass
+		}
+		return 0;
 
+	}
+	return 0;
 }
 
 
@@ -125,31 +149,21 @@ void printElevatorState(char * msg){
 	switch(e.state){
 		case OFFLINE:
 			sprintf(message, "Elevator's movement state: OFFLINE \n");
-
-			//strcpy(elevState, "OFFLINE");
 			break;
 		case IDLE:
 			sprintf(message, "Elevator's movement state: IDLE\n");
-
-			//strcpy(elevState, "IDLE");
 			break;
 		case LOADING:
 			sprintf(message, "Elevator's movement state: LOADING\n");
-
-			//strcpy(elevState, "LOADING");
 			break;
 		case UP:
 			sprintf(message, "Elevator's movement state: UP\n");
-
-			//strcpy(elevState, "UP");
 			break;
-		case DOWN:	
+		case DOWN:
 			sprintf(message, "Elevator's movement state: DOWN\n");
-
-			//strcpy(elevState, "DOWN");
 			break;
-	}		
-	
+	}
+/*
 	sprintf(message, "current floor: %d\n", e.currentFloor);
 	sprintf(message, "Next floor: %d\n", e.next);
 	//sprintf(message, "Current load: %d\n", e.load);
@@ -157,6 +171,7 @@ void printElevatorState(char * msg){
 //----------------NEED TO DO THIS-------------------
 	sprintf(message, "Waiting passengers load: \n");
 	sprintf(message, "Current load: %d\nTotal number of passengers: %d\n", e.load, e.count);
+*/
 }
 
 
@@ -214,9 +229,13 @@ void elevator_syscalls_remove(void){
 
 static int elevator_init(void){
 	printk(KERN_NOTICE"/proc/%s create\n", ENTRY_NAME);
+	elevator_syscalls_create();
+
+
 	fops.open = elevator_proc_open;
 	fops.read = elevator_proc_read;
 	fops.release = elevator_proc_release;
+
 
 	if(!proc_create(ENTRY_NAME, PERMS, NULL, &fops)){
 		printk(KERN_WARNING"ERROR! proc_create\n");
