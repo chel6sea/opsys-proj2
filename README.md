@@ -52,7 +52,16 @@ part 3:
 	./consumer.x --start
 	./producer.x
 	./consumer.x --stop
+	sudo rmmod elevator.ko
 
 ## Bugs/unfinished portions
+
+- system call implementation problem, module is not finding our system calls
+
+		WARNING: "STUB_stop_elevator" [/.../elevator/elevator.ko] undefined!
+		WARNING: "STUB_issue_request" [/.../elevator/elevator.ko] undefined!
+		WARNING: "STUB_start_elevator" [/.../elevator/elevator.ko] undefined!
+
+- we basically can't really test the elevator scheduling implementation because the system calls are not being recognized by the module
 
 
