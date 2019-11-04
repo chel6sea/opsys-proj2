@@ -1,11 +1,15 @@
 # project 2:
 
 ## Division of labor
-Betty Tannuzzo - part 2
+Betty Tannuzzo - part 2, documentation, part 3: helped with structs; 
+		 checkLoad, printElevatorState, printBuildingState,
+		 checkFloor
 
-Nicole Garcia -
+Nicole Garcia -  part 3: loadPassenger, unloadPassenger, helped
+		 with structs, etc...
 
-Chelsea Gary - documentation, part 1, kernel compiling and stuff, part 3: system calls, module and header file
+Chelsea Gary - documentation, part 1, kernel compiling and stuff, 
+	       part 3: system calls, module and header file
 
 
 ## Contents
@@ -17,8 +21,9 @@ part 1:
 
 part 2:
 
-- my_xtime.c -- 
-- Makefile -- 
+- my_xtime.c -- kernel module for time between proc calls  
+- Makefile -- compiles and prints out the number of seconds 
+	      and nanoseconds between proc calls
 
 
 part 3: 
